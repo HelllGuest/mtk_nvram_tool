@@ -1,0 +1,30 @@
+<b>MTK Nvram Tool</b>
+<b></#></b>
+This is a backup & restore script based on Aroma Installer. This tool can backup current Nvram to Sdcard and can restore previous Nvram backup from Sdcard.
+<b></#></b>
+<b></#></b>
+<b><#selectbg_g>Created By</#></b>
+<*>Team DevX</*>
+<b></#></b>
+<b><#selectbg_g>Scripted By</#></b>
+<*>Anoop Kumar</*>
+<b></#></b>
+<b><#selectbg_g>Tested By</#></b>
+<*>Vikas V Nair</*>
+<*>Varun PS</*>
+<*>Chirag Jain</*>
+<b></#></b>
+<b><#selectbg_g>Special Thanks To</#></b>
+<*>Pradeep Murugan</*>
+<*>Nishan Goswami</*>
+<*>Bishal Goswami</*>
+<b></#></b>
+<b></#></b>
+Our official facebook group:
+<#00f>https://www.facebook.com/groups/xolonext<#00f></#>
+Our official page:
+<#00f>https://www.facebook.com/xolothenextlevel<#00f></#>
+Our official blog:
+<#00f>http://www.blog-android.com<#00f></#>
+Our official forum:
+<#00f>http://www.androidjugaad.com<#00f></#>

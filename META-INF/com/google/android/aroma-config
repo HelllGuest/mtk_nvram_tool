@@ -1,0 +1,169 @@
+﻿### LICENSE:
+#
+# Copyright (C) 2011 Ahmad Amarullah ( http://amarullz.com/ )
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+### FILE INFO:
+#
+# AROMA Installer 2.51 - AROMA Installer Test Script Configuration
+#       (c) 2011-2012 by Ahmad Amarullah
+#           amarullz - xda-developers
+#           http://www.amarullz.com/
+#
+#       Binary Version  : 2.56
+#       Binary Codename : Edelweis
+#
+###
+
+ini_set("rom_name",             "NVRAM TOOL");
+ini_set("rom_version",          "1.0");
+ini_set("rom_author",           "AnoopKumar");
+ini_set("rom_device",           "MTK Devices");
+ini_set("rom_date",             "Nov, 28 2013");
+
+splash(2000,"sample");
+
+loadlang("langs/en.lang");
+fontresload( "0", "ttf/Roboto-Regular.ttf", "12" ); 
+fontresload( "1", "ttf/Roboto-Regular.ttf", "18" );
+
+theme("sense");
+exec("/sbin/mount", "-t", "auto", "/data");
+setvar("md5",read("/sdcard/NVRAMBACKUP/nvram.md5"));
+
+
+viewbox(
+  #-- Title
+    "<~welcome.title>",
+  
+  #-- Text
+    "<~welcome.text1> <b>"+
+	  #-- Get Config Value
+	  ini_get("rom_name")+
+	"</b> <~common.for> <b>"+ini_get("rom_device")+"</b>.\n\n"+
+    
+    "<~welcome.text2>\n\n"+
+	
+      "  <~welcome.version>\t: <b><#selectbg_g>"+ini_get("rom_version")+"</#></b>\n"+
+      "  <~welcome.codename>\t: <b><#selectbg_g>Dahlia</#></b>\n"+
+      "  <~welcome.updated>\t: <b><#selectbg_g>"+ini_get("rom_date")+"</#></b>\n\n\n"+
+
+    "<~welcome.next>",
+  
+  #-- Icon
+    "@welcome"
+    );
+
+agreebox(
+  #-- Title
+    "<~terms.title>",
+  
+  #-- Subtitle / Description
+    "<~terms.desc>",
+  
+  #-- Icon
+    "@license",
+  
+  #-- Text Content ( Read from <AROMA Resource Dir>/license.txt )
+    resread("license.txt"),
+  
+  #-- Checkbox Text
+    "<~terms.check>",
+  
+  #-- Unchecked Alert Message
+    "<~terms.confirm>"
+);
+
+textbox("MTK NVRAM TOOL","About","@agreement",resread("about.txt"));
+
+menubox(
+  #-- Title
+    "MTK Nvram Tool",
+  
+  #-- Sub Title
+    "Please select menu below",
+  
+  #-- Icon
+    "@personalize",
+    
+
+    "menu.prop",
+    
+  #-------------------------+-----------------[ Menubox Items ]-------------------------+---------------#
+  # TITLE                   |  SUBTITLE                                                 |   Item Icons  #
+  #-------------------------+-----------------------------------------------------------+---------------#
+  
+    "Nvram Backup",      "Backup current Nvram",       "@apps",      #-- selected = 1
+    "Nvram Restore",       "Restore previous Nvram",                "@install",         #-- selected = 2
+    "Exit",               "Exit Tool",                         "@alert"   #-- selected = 3
+    );
+if prop("menu.prop","selected")=="3" then
+	if
+	  confirm(
+		#-- Title
+		  "Exit",
+		#-- Text
+		  "Are you sure want to exit the Installer?",
+		#-- Icon (Optional)
+		  "@alert"
+	  )=="yes"
+	then
+	  #-- Exit - NOTE: Add dummy argument
+	  exit("");
+	endif;
+    
+  #-- Back To Other Demo Menu
+  back(
+    getvar("1")
+  );
+endif;
+if prop("menu.prop","selected")=="1" then
+		if (getvar("md5")!="") then
+ 				alert("Error","Previous Nvram Backup already exist","@alert");
+				back(getvar("1"));
+		endif;
+								if
+									exec("/sbin/tar", "-cf","/sdcard/nvram.tar","/data/nvram") == "0"
+								then
+									exec("/sbin/mkdir","/sdcard/NVRAMBACKUP");
+									exec("/sbin/cp","/sdcard/nvram.tar","/sdcard/NVRAMBACKUP/nvram.tar");
+									exec("/sbin/rm","-r","/sdcard/nvram.tar");
+									write("/sdcard/NVRAMBACKUP/status.txt", "This folder contains backup of your Nvram. WARNING !!! Do not modify or delete !!! ");
+										if
+											resexec("md5.sh") == "0"
+										then
+											exec("/sbin/md5sum","/sdcard/NVRAMBACKUP/nvram.tar");
+											alert("Backup Completed","Nvram Backup Successfully Completed\n\n"+getvar("exec_buffer"));
+										endif;
+						    endif;
+							back(getvar("1")); 
+endif;
+if prop("menu.prop","selected")=="2" then
+			if (getvar("md5")!="") then
+  							if confirm("Restore Nvram","Previous Nvram Backup is Available in your SDCard\n\n"+"Do you want to restore ?","@info")=="yes"
+								then
+										resexec("del.sh");
+										if
+											exec("/sbin/tar","-xf","/sdcard/NVRAMBACKUP/nvram.tar") == "0"
+										then
+											resexec("pmsn.sh");
+											exec("/sbin/md5sum","/sdcard/NVRAMBACKUP/nvram.tar");
+											alert("Restore Completed","Nvram Restore Successfully Completed\n\n"+getvar("exec_buffer"));
+										endif;
+							endif;
+									back(getvar("1"));
+			endif;
+									alert("Error","Nvram Backup not found","@alert");
+									back(getvar("1"));
+endif;		
